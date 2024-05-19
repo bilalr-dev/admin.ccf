@@ -1,13 +1,19 @@
 // Import NextAuth and session handling functions
+// Імпорт NextAuth та функцій обробки сесій
+
 import NextAuth, { getServerSession } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/lib/mongodb";
 
 // Define email addresses for admin users
-const adminEmails = ['bil.rahaoui94@gmail.com', 'testcclznu@gmail.com'].map(email => email.toLowerCase());
+// Визначте електронні адреси для адміністраторів
+
+const adminEmails = ['testcclznu@gmail.com'];
 
 // Configuration options for NextAuth
+// Опції конфігурації для NextAuth
+
 export const authOptions = {
   secret: process.env.SECRET,
   providers: [
@@ -19,18 +25,13 @@ export const authOptions = {
   adapter: MongoDBAdapter(clientPromise),
   
   // Callback to check if the user is an admin during session creation
+  // Зворотний виклик для перевірки, чи є користувач адміністратором під час створення сесії
+  
   callbacks: {
     session: ({ session, token, user }) => {
-      const userEmail = session?.user?.email?.toLowerCase();
-      console.log('Session callback triggered');
-      console.log('Session:', session);
-      console.log('User email:', userEmail);
-
-      if (adminEmails.includes(userEmail)) {
-        console.log('User is an admin');
+      if (adminEmails.includes(session?.user?.email)) {
         return session;
       } else {
-        console.log('User is not an admin');
         return false;
       }
     },
@@ -38,13 +39,16 @@ export const authOptions = {
 };
 
 // Export NextAuth instance with configured options
+// Експорт екземпляра NextAuth із налаштованими опціями
+
 export default NextAuth(authOptions);
 
 // Function to check if a request is from an admin user
+// Функція для перевірки, чи запит від адміністратора
+
 export async function isAdminRequest(req, res) {
   const session = await getServerSession(req, res, authOptions);
-  const userEmail = session?.user?.email?.toLowerCase();
-  if (!adminEmails.includes(userEmail)) {
+  if (!adminEmails.includes(session?.user?.email)) {
     res.status(401);
     res.end();
     throw 'not an admin';
