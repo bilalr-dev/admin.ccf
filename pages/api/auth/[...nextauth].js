@@ -9,7 +9,7 @@ import clientPromise from "@/lib/mongodb";
 // Define email addresses for admin users
 // Визначте електронні адреси для адміністраторів
 
-const adminEmails = ['bil.rahaoui94@gmail.com'];
+const adminEmails = ['bil.rahaoui94@gmail.com', 'testcclznu@example.com'];
 
 // Configuration options for NextAuth
 // Опції конфігурації для NextAuth
