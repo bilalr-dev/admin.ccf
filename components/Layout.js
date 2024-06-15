@@ -15,7 +15,23 @@ export default function Layout({ children }) {
 
   // Get the user session using next-auth/react hooks
   // Отримання сеансу користувача за допомогою хуків next-auth/react
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+  // Display loading state if session is loading
+  // Відображення стану завантаження, якщо сеанс завантажується
+  if (status === "loading") {
+    return (
+      <div className="bg-gradient-to-t from-sky-400 to-indigo-900 min-h-screen flex items-center justify-center">
+        <div className="text-center w-full">
+          <div className="flex items-center justify-center">
+            <div className="relative flex flex-col text-gray-700 bg-white shadow-md bg-clip-border rounded-xl w-[32rem] p-6">
+              <p>Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Render login page if there is no active session
   // Відображення сторінки входу, якщо сеанс не активний
@@ -123,7 +139,18 @@ export default function Layout({ children }) {
         <div className="flex-grow p-4">
           {/* Child components or pages go here */}
           {/* Дочірні компоненти або сторінки розміщуються тут */}
-          {children}
+          {session?.user?.isAdmin ? (
+            // Display the content only if the user is an admin
+            // Відображення вмісту, тільки якщо користувач є адміністратором
+            <>{children}</>
+          ) : (
+            // Display an error message if the user is not an admin
+            // Відображення повідомлення про помилку, якщо користувач не адміністратор
+            <div className="flex flex-col items-center justify-center min-h-screen">
+              <h1 className="text-3xl font-bold text-red-500">Unauthorized Access</h1>
+              <p className="text-gray-500 mt-4">You do not have permission to access this page.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
