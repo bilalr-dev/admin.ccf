@@ -33,7 +33,8 @@ export const authOptions = {
         session.user.isAdmin = true; // Set an isAdmin flag on the session
         return session;
       } else {
-        return false; // Return false if not an admin
+        session.user.error = "Unauthorized: Not an admin"; // Add error flag
+        return session; // Return false if not an admin
       }
     },
   },
