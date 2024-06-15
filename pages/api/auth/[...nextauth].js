@@ -30,9 +30,10 @@ export const authOptions = {
   callbacks: {
     session: ({ session, token, user }) => {
       if (adminEmails.includes(session?.user?.email)) {
+        session.user.isAdmin = true; // Set an isAdmin flag on the session
         return session;
       } else {
-        return false;
+        return session; // Still return the session, but not as an admin
       }
     },
   },
@@ -48,9 +49,8 @@ export default NextAuth(authOptions);
 
 export async function isAdminRequest(req, res) {
   const session = await getServerSession(req, res, authOptions);
-  if (!adminEmails.includes(session?.user?.email)) {
-    res.status(401);
-    res.end();
-    throw 'not an admin';
+  if (!session?.user?.isAdmin) { // Check the isAdmin flag
+    res.status(401).json({ error: 'Unauthorized: Not an admin' }); // Send an error response
+    return;
   }
 }
