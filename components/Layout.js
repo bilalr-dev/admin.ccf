@@ -1,5 +1,5 @@
 // Layout.js
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import Nav from "@/components/Nav";
 import { useState, useEffect } from "react";
 import Logo from "@/components/Logo";
@@ -8,9 +8,8 @@ import Image from "next/image";
 export default function Layout({ children }) {
   const [showNav, setShowNav] = useState(false);
   const { data: session, status } = useSession();
-  const [isAdmin, setIsAdmin] = useState(false); // Track isAdmin separately
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Use useEffect to check isAdmin based on session and status
   useEffect(() => {
     if (status === "authenticated" && session?.user?.isAdmin) {
       setIsAdmin(true);
@@ -19,7 +18,14 @@ export default function Layout({ children }) {
     }
   }, [session, status]);
 
-  // Render login page if there is no active session
+  if (status === "loading") {
+    return (
+      <div className="bg-red-100 min-h-screen flex items-center justify-center text-center">
+        <p className="text-3xl font-bold text-red-500">Loading...</p>
+      </div>
+    );
+  }
+
   if (!session) {
     return (
       <div className="bg-gradient-to-t from-sky-400 to-indigo-900 min-h-screen flex items-center justify-center">
@@ -27,14 +33,14 @@ export default function Layout({ children }) {
           <div className="flex items-center justify-center">
             <div className="relative flex flex-col text-gray-700 bg-white shadow-md bg-clip-border rounded-xl w-[32rem] p-6">
               <div className="flex items-center justify-center mb-4">
-                <h1 href={'/'} className="flex gap-1">
+                <h1 className="flex gap-1">
                   <Image
                     src="https://www.vectorlogo.zone/logos/mongodb/mongodb-icon.svg"
                     width={48}
                     height={48}
                     alt="CordeCraftingLab"
                   />
-                  <span className="text-3xl text-gray-800	">CodeCraftingLab Admin Panel</span>
+                  <span className="text-3xl text-gray-800">CodeCraftingLab Admin Panel</span>
                 </h1>
               </div>
               <div className="mb-6">
@@ -48,17 +54,6 @@ export default function Layout({ children }) {
                   <svg
                     className="mr-2 -ml-1 w-8 h-8"
                     aria-hidden="true"
-
-    
-        
-          
-    
-
-        
-        Expand All
-    
-    @@ -55,11 +71,15 @@ export default function Layout({ children }) {
-  
                     focusable="false"
                     data-prefix="fab"
                     data-icon="google"
@@ -74,17 +69,6 @@ export default function Layout({ children }) {
                   Sign in with Google
                 </button>
               </div>
-
-    
-        
-          
-    
-
-        
-        Expand All
-    
-    @@ -70,38 +90,42 @@ export default function Layout({ children }) {
-  
             </div>
           </div>
         </div>
@@ -92,10 +76,9 @@ export default function Layout({ children }) {
     );
   }
 
-  // Render the main layout if there is an active session and the user is an admin
   if (session && isAdmin) {
     return (
-      <div className="bg-gradient-to-br from-blue-300 via-blue-400 to-indigo-300 min-h-screen ">
+      <div className="bg-gradient-to-br from-blue-300 via-blue-400 to-indigo-300 min-h-screen">
         <div className="block md:hidden flex items-center p-4">
           <button onClick={() => setShowNav(true)}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
@@ -115,14 +98,9 @@ export default function Layout({ children }) {
       </div>
     );
   } else {
-    // Render an error message if the user is not an admin or session is loading/error
     return (
       <div className="bg-red-100 min-h-screen flex items-center justify-center text-center">
-        {status === "loading" ? (
-          <p className="text-3xl font-bold text-red-500">Loading...</p>
-        ) : (
-          <h1 className="text-3xl font-bold text-red-500">Unauthorized: Not an admin</h1>
-        )}
+        <h1 className="text-3xl font-bold text-red-500">Unauthorized: Not an admin</h1>
       </div>
     );
   }
