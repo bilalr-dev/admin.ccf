@@ -1,19 +1,14 @@
 // Import NextAuth and session handling functions
 // Імпорт NextAuth та функцій обробки сесій
-
 import NextAuth, { getServerSession } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
 import clientPromise from "@/lib/mongodb";
-
 // Define email addresses for admin users
 // Визначте електронні адреси для адміністраторів
-
 const adminEmails = ['bil.rahaoui94@gmail.com'];
-
 // Configuration options for NextAuth
 // Опції конфігурації для NextAuth
-
 export const authOptions = {
   secret: process.env.SECRET,
   providers: [
@@ -30,27 +25,25 @@ export const authOptions = {
   callbacks: {
     session: ({ session, token, user }) => {
       if (adminEmails.includes(session?.user?.email)) {
+        session.user.isAdmin = true; // Set an isAdmin flag on the session
         return session;
       } else {
-        return false;
+        session.user.error = "Unauthorized: Not an admin"; // Add error flag
+        return session; // Return false if not an admin
       }
     },
   },
 };
-
 // Export NextAuth instance with configured options
 // Експорт екземпляра NextAuth із налаштованими опціями
-
 export default NextAuth(authOptions);
-
 // Function to check if a request is from an admin user
 // Функція для перевірки, чи запит від адміністратора
 
 export async function isAdminRequest(req, res) {
   const session = await getServerSession(req, res, authOptions);
-  if (!adminEmails.includes(session?.user?.email)) {
-    res.status(401);
-    res.end();
-    throw 'not an admin';
+  if (!session?.user?.isAdmin) { // Check the isAdmin flag
+    res.status(401).json({ error: 'Unauthorized: Not an admin' }); // Send an error response
+    return;
   }
 }
