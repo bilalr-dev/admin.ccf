@@ -15,25 +15,13 @@ export default function Layout({ children }) {
 
   // Get the user session using next-auth/react hooks
   // Отримання сеансу користувача за допомогою хуків next-auth/react
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
-  // Display loading state if session is loading
-  // Відображення стану завантаження, якщо сеанс завантажується
-  if (status === "loading") {
-    return (
-      <div className="bg-gradient-to-t from-sky-400 to-indigo-900 min-h-screen flex items-center justify-center">
-        <div className="text-center w-full">
-          <div className="flex items-center justify-center">
-            <div className="relative flex flex-col text-gray-700 bg-white shadow-md bg-clip-border rounded-xl w-[32rem] p-6">
-              <p>Loading...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Check if the user is an admin
+  // Перевірка, чи користувач адміністратор
+  const isAdmin = session?.user?.isAdmin;
 
-  // Render login page if there is no active session
+  // Render the login page if there is no active session
   // Відображення сторінки входу, якщо сеанс не активний
   if (!session) {
     return (
@@ -106,53 +94,52 @@ export default function Layout({ children }) {
     );
   }
 
-  // Render the main layout if there is an active session
-  // Відображення основного макету, якщо сеанс активний
-  return (
-    // Container for the main layout with a gradient background
-    // Контейнер для основного макету з градієнтним фоном
-    <div className="bg-gradient-to-br from-blue-300 via-blue-400 to-indigo-300 min-h-screen ">
-      <div className="block md:hidden flex items-center p-4">
-        {/* Button to toggle the navigation menu */}
-        {/* Кнопка для перемикання меню навігації */}
-        <button onClick={() => setShowNav(true)}>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-            {/* Hamburger icon for the button */}
-            {/* Іконка гамбургера для кнопки */}
-            <path fillRule="evenodd" d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
-          </svg>
-        </button>
-        {/* Logo in the mobile view */}
-        {/* Логотип у мобільному вигляді */}
-        <div className="flex grow justify-center mr-6">
-          <Logo />
+  // Render the main layout if there is an active session and the user is an admin
+  // Відображення основного макету, якщо сеанс активний та користувач адміністратор
+  if (session && isAdmin) {
+    return (
+      // Container for the main layout with a gradient background
+      // Контейнер для основного макету з градієнтним фоном
+      <div className="bg-gradient-to-br from-blue-300 via-blue-400 to-indigo-300 min-h-screen ">
+        <div className="block md:hidden flex items-center p-4">
+          {/* Button to toggle the navigation menu */}
+          {/* Кнопка для перемикання меню навігації */}
+          <button onClick={() => setShowNav(true)}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              {/* Hamburger icon for the button */}
+              {/* Іконка гамбургера для кнопки */}
+              <path fillRule="evenodd" d="M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm0 5.25a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
+            </svg>
+          </button>
+          {/* Logo in the mobile view */}
+          {/* Логотип у мобільному вигляді */}
+          <div className="flex grow justify-center mr-6">
+            <Logo />
+          </div>
+        </div>
+        {/* Main content area with navigation and child components */}
+        {/* Основна область вмісту з навігацією та дочірніми компонентами */}
+        <div className="flex">
+          {/* Navigation menu */}
+          {/* Меню навігації */}
+          <Nav show={showNav} />
+          {/* Main content area */}
+          {/* Основна область вмісту */}
+          <div className="flex-grow p-4">
+            {/* Child components or pages go here */}
+            {/* Дочірні компоненти або сторінки розміщуються тут */}
+            {children}
+          </div>
         </div>
       </div>
-      {/* Main content area with navigation and child components */}
-      {/* Основна область вмісту з навігацією та дочірніми компонентами */}
-      <div className="flex">
-        {/* Navigation menu */}
-        {/* Меню навігації */}
-        <Nav show={showNav} />
-        {/* Main content area */}
-        {/* Основна область вмісту */}
-        <div className="flex-grow p-4">
-          {/* Child components or pages go here */}
-          {/* Дочірні компоненти або сторінки розміщуються тут */}
-          {session?.user?.isAdmin ? (
-            // Display the content only if the user is an admin
-            // Відображення вмісту, тільки якщо користувач є адміністратором
-            <>{children}</>
-          ) : (
-            // Display an error message if the user is not an admin
-            // Відображення повідомлення про помилку, якщо користувач не адміністратор
-            <div className="flex flex-col items-center justify-center min-h-screen">
-              <h1 className="text-3xl font-bold text-red-500">Unauthorized Access</h1>
-              <p className="text-gray-500 mt-4">You do not have permission to access this page.</p>
-            </div>
-          )}
-        </div>
+    );
+  } else {
+    // Render an error message if the user is not an admin
+    // Відображення повідомлення про помилку, якщо користувач не адміністратор
+    return (
+      <div className="bg-red-100 min-h-screen flex items-center justify-center text-center">
+        <h1 className="text-3xl font-bold text-red-500">Unauthorized: Not an admin</h1>
       </div>
-    </div>
-  );
+    );
+  }
 }
