@@ -33,7 +33,7 @@ const CourseForm = ({
   const [youtubeUrlError, setYoutubeUrlError] = useState(null);
   const router = useRouter();
   const [selectedText, setSelectedText] = useState("");
-const [buttonAction, setButtonAction] = useState("");
+  const [buttonAction, setButtonAction] = useState("");
 
   // Accepted YouTube URL formats and corresponding regular expressions
   // Прийняті формати URL YouTube та відповідні регулярні вирази
@@ -535,6 +535,7 @@ const [buttonAction, setButtonAction] = useState("");
       {/* Модаль зображення */}
       {selectedImage && (
         // Display the selected image in a modal
+        // Відображення вибраного зображення в модальному вікні
         // Відображення вибраного зображення в модальному вікні
         <div
           className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center"
